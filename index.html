@@ -48,8 +48,15 @@
             50% { opacity: 1; }
             100% { opacity: 0.6; }
         }
+        @keyframes sos-flicker {
+            0%, 100% { border-color: rgba(239, 68, 68, 0.3); box-shadow: 0 0 5px rgba(239, 68, 68, 0.1); }
+            50% { border-color: rgba(239, 68, 68, 0.8); box-shadow: 0 0 20px rgba(239, 68, 68, 0.4); }
+        }
         .animate-neon-pulse {
             animation: pulse-neon 2s infinite;
+        }
+        .animate-sos-flicker {
+            animation: sos-flicker 1.5s infinite;
         }
     </style>
 <script type="importmap">
@@ -63,7 +70,6 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
 <body class="text-slate-200 overflow-x-hidden">
     <div id="root"></div>

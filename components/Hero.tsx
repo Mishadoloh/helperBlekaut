@@ -8,7 +8,7 @@ interface HeroProps {
 
 const Hero: React.FC<HeroProps> = ({ onNavigate }) => {
   return (
-    <div className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+    <div id="hero" className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
       <div className="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-[600px] h-[600px] bg-amber-500/10 rounded-full blur-[120px] z-0"></div>
       <div className="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-[500px] h-[500px] bg-orange-600/10 rounded-full blur-[100px] z-0"></div>
 
@@ -52,7 +52,7 @@ const Hero: React.FC<HeroProps> = ({ onNavigate }) => {
             <div className="relative z-20 group">
               <div className="relative rounded-[3rem] overflow-hidden border-8 border-slate-800/50 shadow-2xl transition-transform duration-500 group-hover:scale-[1.02]">
                 <img 
-                  src="public/images/chatgpt-image.png.png" 
+                  src="https://images.unsplash.com/photo-1519211975560-4ad61181398d?auto=format&fit=crop&q=80&w=800" 
                   alt="Затишок при свічках" 
                   className="w-full h-auto opacity-70"
                 />

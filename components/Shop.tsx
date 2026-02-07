@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { ShopItem, CartItem } from '../types';
 
 export const INGREDIENTS_DB: ShopItem[] = [
+  // ... (база даних залишається без змін)
   { id: 1, name: 'Гречка', price: 45, category: 'крупи', desc: 'Ядриця, перший сорт. 1кг. Термін зберігання 12 місяців.' },
   { id: 2, name: 'Рис пропарений', price: 55, category: 'крупи', desc: 'Довгозернистий, шліфований. 1кг. Підходить для термоса.' },
   { id: 3, name: 'Кускус', price: 60, category: 'крупи', desc: 'Дрібна фракція пшеничної крупи. 500г. Готується запарюванням.' },
@@ -50,11 +51,13 @@ export const INGREDIENTS_DB: ShopItem[] = [
 interface ShopProps {
   cart: CartItem[];
   onAdd: (item: ShopItem) => void;
+  onDecrement: (id: number) => void;
   onRemove: (id: number) => void;
   onClearCart: () => void;
+  onOrderSuccess: () => void;
 }
 
-const Shop: React.FC<ShopProps> = ({ cart, onAdd, onRemove, onClearCart }) => {
+const Shop: React.FC<ShopProps> = ({ cart, onAdd, onDecrement, onRemove, onClearCart, onOrderSuccess }) => {
   const [activeCategory, setActiveCategory] = useState<string>('усі');
   const [orderStatus, setOrderStatus] = useState<'idle' | 'success'>('idle');
   
@@ -67,7 +70,7 @@ const Shop: React.FC<ShopProps> = ({ cart, onAdd, onRemove, onClearCart }) => {
   const handleOrder = () => {
     if (cart.length === 0) return;
     setOrderStatus('success');
-    // Симуляція затримки перед очищенням
+    onOrderSuccess();
     setTimeout(() => {
       onClearCart();
       setOrderStatus('idle');
@@ -112,46 +115,78 @@ const Shop: React.FC<ShopProps> = ({ cart, onAdd, onRemove, onClearCart }) => {
           ))}
         </div>
 
-        {orderStatus === 'success' && (
-          <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[200] w-full max-w-md px-4">
-             <div className="bg-emerald-500 text-slate-950 p-6 rounded-[2rem] shadow-[0_0_50px_rgba(16,185,129,0.4)] text-center animate-in zoom-in duration-300">
-                <p className="font-black uppercase tracking-widest text-sm mb-1">Дякуємо за покупку!</p>
-                <p className="text-xs font-bold opacity-80">Ваше замовлення успішно оформлено.</p>
-             </div>
-          </div>
-        )}
-
         {cart.length > 0 && orderStatus === 'idle' && (
           <div className="fixed bottom-8 right-8 z-[150] w-full max-w-sm px-4 md:px-0">
             <div className="bg-slate-900 border border-emerald-500/30 p-8 rounded-[2.5rem] shadow-[0_40px_80px_rgba(0,0,0,0.9)] backdrop-blur-xl">
               <h3 className="text-white font-black uppercase tracking-widest text-xs mb-6 border-b border-white/5 pb-4">Ваш кошик</h3>
-              <div className="max-h-48 overflow-y-auto mb-6 custom-scrollbar pr-2">
+              <div className="max-h-64 overflow-y-auto mb-6 custom-scrollbar pr-2">
                 {cart.map(item => (
-                  <div key={item.id} className="flex justify-between items-center mb-4 last:mb-0">
-                    <div className="flex-1">
-                      <p className="text-white text-xs font-bold leading-none mb-1">{item.name}</p>
-                      <p className="text-slate-500 text-[10px] uppercase font-black">{item.quantity} шт x {item.price}₴</p>
+                  <div key={item.id} className="flex flex-col mb-6 last:mb-0 bg-white/5 p-4 rounded-2xl border border-white/5">
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex-1">
+                        <p className="text-white text-xs font-bold leading-tight">{item.name}</p>
+                        <p className="text-slate-500 text-[9px] uppercase font-black tracking-wider mt-1">{item.price} ₴ / шт</p>
+                      </div>
+                      <button 
+                        onClick={() => onRemove(item.id)} 
+                        className="text-slate-600 hover:text-rose-500 transition-colors p-1"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                      </button>
                     </div>
-                    <button onClick={() => onRemove(item.id)} className="text-rose-500 text-[10px] font-black uppercase hover:text-rose-400 p-2">Видалити</button>
+                    
+                    <div className="flex items-center justify-between">
+                       <div className="flex items-center bg-slate-950/50 rounded-xl border border-white/10 p-1">
+                          <button 
+                            onClick={() => onDecrement(item.id)}
+                            className="w-8 h-8 flex items-center justify-center text-white hover:bg-white/10 rounded-lg transition-all active:scale-90"
+                          >
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M20 12H4" /></svg>
+                          </button>
+                          <span className="w-10 text-center text-xs font-black text-white">{item.quantity}</span>
+                          <button 
+                            onClick={() => onAdd(item)}
+                            className="w-8 h-8 flex items-center justify-center text-emerald-500 hover:bg-emerald-500/10 rounded-lg transition-all active:scale-90"
+                          >
+                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
+                          </button>
+                       </div>
+                       <div className="text-right">
+                          <p className="text-emerald-500 text-sm font-black">{item.price * item.quantity} ₴</p>
+                       </div>
+                    </div>
                   </div>
                 ))}
               </div>
               <div className="flex items-center justify-between border-t border-white/5 pt-6">
                 <div>
-                  <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">Сума</p>
+                  <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">Разом</p>
                   <p className="text-emerald-500 text-2xl font-black">{total} ₴</p>
                 </div>
                 <button 
                   onClick={handleOrder}
                   className="bg-emerald-600 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-emerald-900/40 hover:bg-emerald-500 active:scale-95 transition-all"
                 >
-                  Замовити
+                  Оформити
                 </button>
               </div>
             </div>
           </div>
         )}
       </div>
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.02);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(16, 185, 129, 0.2);
+          border-radius: 10px;
+        }
+      `}</style>
     </div>
   );
 };
